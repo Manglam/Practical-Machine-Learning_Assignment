@@ -1,0 +1,46 @@
+Assignment--Practical Machine Learning
+========================================================
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring web pages (click the **Help** toolbar button for more details on using R Markdown).
+
+When you click the **Knit HTML** button a web page will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+#setting working directory for data 
+wd_data <- "C:/Users/zik48224/Downloads/Practical Machine Learning"
+setwd(wd_data)
+
+tr <- read.csv("pml-training.csv")
+test <- read.csv("pml-testing.csv")
+
+#No need for observatio number. so removing it
+tr <- tr[,-1]
+#removing timestamps
+tr <- tr[,-c(1:3)]
+
+
+#Doing gbm to understand important variables
+library(caret)
+library(gbm)
+model1 <- gbm(classe~.,data=tr,n.trees=100,interaction.depth=6,shrinkage=0.001)
+summary(model1)
+
+#taking only important varibales from the train set 
+tr_n <- tr[,c("roll_belt","num_window","pitch_forearm","magnet_dumbbell_y",
+  	  "magnet_dumbbell_z","yaw_belt","yaw_arm","magnet_belt_z",
+		  "roll_dumbbell","accel_forearm_x","gyros_dumbbell_y",
+		  "accel_dumbbell_y","accel_dumbbell_x","accel_dumbbell_z",
+		  "accel_forearm_z","gyros_belt_z","accel_arm_x","pitch_belt",
+		  "magnet_belt_y","magnet_forearm_x","magnet_forearm_z",
+		  "magnet_dumbbell_x","roll_forearm","classe")]
+model1 <- train(classe ~.,tr_n,method="gbm")
+summary(model1$finalModel)
+pred <- predict(model1$finalModel,test)
+```
+
+summary Plot
+
+```{r fig.width=7, fig.height=6}
+summary(model1$finalModel)
+```
+
